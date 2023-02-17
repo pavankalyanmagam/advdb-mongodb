@@ -76,8 +76,6 @@ public class HuluService {
 
     public void updateHuluByTitle(String title, Hulu hulu) {
         List<Hulu> byTitle = huluRepository.findByTitle(title);
-        System.out.println(hulu);
-        System.out.println(byTitle);
         if (!byTitle.isEmpty()) {
             Hulu existingHulu = byTitle.get(0);
             existingHulu.setId(hulu.getId());

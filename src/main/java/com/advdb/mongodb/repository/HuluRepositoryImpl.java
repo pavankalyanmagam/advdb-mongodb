@@ -26,6 +26,4 @@ public class HuluRepositoryImpl implements HuluRepositoryCustom{
         mongoTemplate.remove(query, Hulu.class);
     }
 
-    public void deleteByTitle(String title) {
-    }
 }
