@@ -25,4 +25,7 @@ public class HuluRepositoryImpl implements HuluRepositoryCustom{
         Query query = new Query(Criteria.where("id").is(id));
         mongoTemplate.remove(query, Hulu.class);
     }
+
+    public void deleteByTitle(String title) {
+    }
 }

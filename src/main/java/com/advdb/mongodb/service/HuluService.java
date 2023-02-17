@@ -4,7 +4,11 @@ import com.advdb.mongodb.entity.Hulu;
 import com.advdb.mongodb.exception.HuluCollectionException;
 import com.advdb.mongodb.repository.HuluRepository;
 import com.advdb.mongodb.repository.HuluRepositoryImpl;
+import com.mongodb.client.result.DeleteResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +25,9 @@ public class HuluService {
     private HuluRepository huluRepository;
 
     @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
     private HuluRepositoryImpl huluRepositoryImpl;
 
     public List<Hulu> getAllHulu() {
@@ -33,14 +40,12 @@ public class HuluService {
     }
 
     public List<Hulu> getHuluById(Integer id) {
-
         List<Hulu> allById = huluRepository.findAllById(id);
-
         if (allById.size() > 0) {
             return allById;
         }
         else {
-            throw new HuluCollectionException(HuluCollectionException.NotFoundException(id));
+            throw new HuluCollectionException(HuluCollectionException.NotFoundException(String.valueOf(id)));
         }
 
     }
@@ -49,47 +54,42 @@ public class HuluService {
         return huluRepository.save(hulu);
     }
 
-    public Hulu updateHulu(Integer id, Hulu hulu) {
-        Optional<Hulu> optionalHulu = Optional.ofNullable(huluRepositoryImpl.findById(id));
-        if (optionalHulu.isPresent()) {
-            Hulu existingHulu = optionalHulu.get();
-            existingHulu.setTitle(hulu.getTitle());
-            existingHulu.setClips_count(hulu.getClips_count());
-            existingHulu.setDescription(hulu.getDescription());
-            existingHulu.setEpisodes_count(hulu.getEpisodes_count());
-            existingHulu.setGenres(hulu.getGenres());
-            existingHulu.setScore(hulu.getScore());
-            existingHulu.setSeasons_count(hulu.getSeasons_count());
-            existingHulu.setReleased_at(hulu.getReleased_at());
-            existingHulu.setRating(hulu.getRating());
 
-            return huluRepository.save(existingHulu);
-        } else {
-            throw new HuluCollectionException("Hulu Show with id " + id + " not found");
-        }
-    }
-    public Hulu updateHuluRating(Integer id, Hulu hulu) {
-        Optional<Hulu> optionalHulu = Optional.ofNullable(huluRepositoryImpl.findById(id));
-        if (optionalHulu.isPresent()) {
-            Hulu existingHulu = optionalHulu.get();
-            existingHulu.setRating(hulu.getRating());  // update only the rating field
-            return huluRepository.save(existingHulu);  // save the updated object
-        } else {
-            throw new HuluCollectionException("Hulu Show with id " + id + " not found");
-        }
+    public void deleteHulu(String title) {
+            Query query = new Query(Criteria.where("title").is(title));
+            DeleteResult result = mongoTemplate.remove(query, Hulu.class);
+            if (result.getDeletedCount() == 0) {
+                throw new HuluCollectionException("Hulu show with title " + title + " not found");
+            }
     }
 
-
-    public void deleteHulu(Integer id) {
-        Optional<Hulu> optionalHulu = Optional.ofNullable(huluRepositoryImpl.findById(id));
-        if (optionalHulu.isPresent()) {
-            huluRepositoryImpl.deleteById(id);
-        } else {
-            throw new HuluCollectionException("Hulu Show with id " + id + " not found");
-        }
-    }
 
     public List<Hulu> getHuluByTitle(String title) {
-        return huluRepository.findByTitle(title);
+        List<Hulu> allByTitle = huluRepository.findByTitle(title);
+        if (allByTitle.size() > 0) {
+            return allByTitle;
+        }
+        else {
+            throw new HuluCollectionException(HuluCollectionException.NotFoundException(title));
+        }
     }
+
+    public void updateHuluByTitle(String title, Hulu hulu) {
+        List<Hulu> byTitle = huluRepository.findByTitle(title);
+        System.out.println(hulu);
+        System.out.println(byTitle);
+        if (!byTitle.isEmpty()) {
+            Hulu existingHulu = byTitle.get(0);
+            existingHulu.setId(hulu.getId());
+            existingHulu.setTitle(hulu.getTitle());
+            existingHulu.setDescription(hulu.getDescription());
+            existingHulu.setScore(hulu.getScore());
+            existingHulu.setRating(hulu.getRating());
+
+            huluRepository.save(existingHulu);
+        } else {
+            throw new HuluCollectionException("Hulu Show with title " + title + " not found");
+        }
+    }
+
 }

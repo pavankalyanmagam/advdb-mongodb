@@ -11,4 +11,6 @@ public interface HuluRepository extends MongoRepository<Hulu, Integer> {
 
     @Query("{'id': ?0}")
     List<Hulu> findAllById(Integer id);
+
+    void deleteByTitle(String title);
 }

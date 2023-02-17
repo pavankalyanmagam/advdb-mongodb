@@ -16,11 +16,62 @@ public class HuluController {
     @Autowired
     private HuluService huluService;
 
-    // Get All the Hulu Data
+    // 1.	Insert the new movie and show.
+    @PostMapping
+    public ResponseEntity<?> createHulu(@RequestBody Hulu hulu) {
+        try {
+            Hulu createdHulu = huluService.createHulu(hulu);
+            return new ResponseEntity<Hulu>(createdHulu, HttpStatus.OK);
+        } catch (HuluCollectionException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+
+    }
+
+    // 2.	Update the movie and show information using title. (By update only id, title, description, score, and rating)
+
+    @PutMapping("/{title}")
+    public ResponseEntity<?> updateHulu(@PathVariable String  title, @RequestBody Hulu hulu) {
+
+        try {
+            huluService.updateHuluByTitle(title, hulu);
+            return new ResponseEntity<>("Updated Hulu Show/Movie with title "+title+"", HttpStatus.OK);
+        } catch (HuluCollectionException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // 3.	Delete the movie and show information using title.
+    @DeleteMapping("/{title}")
+    public ResponseEntity<?> deleteHuluByTitle(@PathVariable String title) {
+        try{
+            huluService.deleteHulu(title);
+            return new ResponseEntity<>("Successfully deleted Hulu Show with title "+title, HttpStatus.OK);
+        }
+        catch (HuluCollectionException e)
+        {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // 4.	Retrieve all the movies and shows in database.
     @GetMapping
     public ResponseEntity<?> getAllHulu() {
         List<Hulu> allHulu = huluService.getAllHulu();
         return  new ResponseEntity<>(allHulu, allHulu.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+
+    // 5.	Display the movie and show’s detail using title.
+
+    @GetMapping("/title/{title}")
+    public ResponseEntity<?> getHuluDataByTitle(@PathVariable String title) {
+
+        try {
+            return new ResponseEntity<>(huluService.getHuluByTitle(title), HttpStatus.OK);
+        } catch (HuluCollectionException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     // Get All the Hulu Data With the Id(Searches for the specified id and return the data with id).
@@ -33,64 +84,4 @@ public class HuluController {
         }
     }
 
-    // To Save the New Hulu Data.
-    @PostMapping
-    public ResponseEntity<?> createHulu(@RequestBody Hulu hulu) {
-        try {
-            Hulu createdHulu = huluService.createHulu(hulu);
-            return new ResponseEntity<Hulu>(createdHulu, HttpStatus.OK);
-        } catch (HuluCollectionException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
-
-    }
-
-    // Update Hulu Data with given new updated information.
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateHulu(@PathVariable Integer id, @RequestBody Hulu hulu) {
-
-        try {
-            huluService.updateHulu(id, hulu);
-            return new ResponseEntity<>("Updated Hulu Show with id "+id+"", HttpStatus.OK);
-        } catch (HuluCollectionException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("rating/{id}")
-    public ResponseEntity<?> updateHuluRating(@PathVariable Integer id, @RequestBody Hulu hulu) {
-
-        try {
-            huluService.updateHuluRating(id, hulu);
-            return new ResponseEntity<>("Updated Hulu Show with id "+id+"", HttpStatus.OK);
-        } catch (HuluCollectionException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-    // Delete Hulu data for the given id.
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHulu(@PathVariable Integer id) {
-        try{
-            huluService.deleteHulu(id);
-            return new ResponseEntity<>("Successfully deleted Hulu Show with id "+id, HttpStatus.OK);
-        }
-        catch (HuluCollectionException e)
-        {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    // Get Hulu Data Using Title
-
-    @GetMapping("/title/{title}")
-    public ResponseEntity<?> getHuluDataByTitle(@PathVariable String title) {
-
-        try {
-            return new ResponseEntity<>(huluService.getHuluByTitle(title), HttpStatus.OK);
-        } catch (HuluCollectionException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
 }

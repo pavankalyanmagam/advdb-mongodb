@@ -5,8 +5,8 @@ public  class HuluCollectionException extends RuntimeException {
         super(message);
     }
 
-    public static String NotFoundException(Integer id) {
-        return "Hulu Show with id "+id+" not found!";
+    public static String NotFoundException(String id) {
+        return "Hulu Show with title "+id+" not found!";
     }
 
     public static String HuluAlreadyExists() {
