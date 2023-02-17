@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/hulu")
 public class HuluController {
 
     @Autowired
     private HuluService huluService;
 
     // 1.	Insert the new movie and show.
-    @PostMapping
+    @PostMapping("api/hulu")
     public ResponseEntity<?> createHulu(@RequestBody Hulu hulu) {
         try {
             Hulu createdHulu = huluService.createHulu(hulu);
@@ -30,7 +29,7 @@ public class HuluController {
 
     // 2.	Update the movie and show information using title. (By update only id, title, description, score, and rating)
 
-    @PutMapping("/{title}")
+    @PutMapping("/api/hulu/{title}")
     public ResponseEntity<?> updateHulu(@PathVariable String  title, @RequestBody Hulu hulu) {
 
         try {
@@ -42,7 +41,7 @@ public class HuluController {
     }
 
     // 3.	Delete the movie and show information using title.
-    @DeleteMapping("/{title}")
+    @DeleteMapping("/api/hulu/{title}")
     public ResponseEntity<?> deleteHuluByTitle(@PathVariable String title) {
         try{
             huluService.deleteHulu(title);
@@ -55,7 +54,7 @@ public class HuluController {
     }
 
     // 4.	Retrieve all the movies and shows in database.
-    @GetMapping
+    @GetMapping("/api/hulu")
     public ResponseEntity<?> getAllHulu() {
         List<Hulu> allHulu = huluService.getAllHulu();
         return  new ResponseEntity<>(allHulu, allHulu.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -64,7 +63,7 @@ public class HuluController {
 
     // 5.	Display the movie and show’s detail using title.
 
-    @GetMapping("/title/{title}")
+    @GetMapping("api/hulu/title/{title}")
     public ResponseEntity<?> getHuluDataByTitle(@PathVariable String title) {
 
         try {
@@ -75,7 +74,7 @@ public class HuluController {
     }
 
     // Get All the Hulu Data With the Id(Searches for the specified id and return the data with id).
-    @GetMapping("/{id}")
+    @GetMapping("/api/hulu/{id}")
     public ResponseEntity<?> getHuluById(@PathVariable Integer id) {
         try {
             return new ResponseEntity<>(huluService.getHuluById(id), HttpStatus.OK);

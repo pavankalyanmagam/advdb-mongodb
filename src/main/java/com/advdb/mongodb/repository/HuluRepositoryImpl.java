@@ -15,7 +15,6 @@ public class HuluRepositoryImpl implements HuluRepositoryCustom{
 
     @Override
     public Hulu findById(int id) {
-
         Query query = new Query(Criteria.where("id").is(id));
         return mongoTemplate.findOne(query, Hulu.class);
     }
